@@ -1,4 +1,4 @@
-package com.paqueteriacalva
+package com.devvi.paqueteriacalva
 
 import android.app.Application
 import com.facebook.react.PackageList
