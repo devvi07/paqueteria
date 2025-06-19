@@ -11,14 +11,34 @@ export const HomeScreen = ({ route, navigation }: any) => {
     const SALIDAS_LOCAL = useQuery(SalidasModel);
     const [loading, setLoading] = useState(false);
     const { width, height } = useWindowDimensions();
+    const [ salidas, setSalidas ] = useState([]);
 
     const goToClientes = (destino: string, fecha: string) => {
         //navigation.navigate('VerClientes',{ destino: destino, fecha: fecha });
         navigation.navigate('Clasificaciones',{ destino: destino, fecha: fecha });
     };
 
+    const getSalidas = async() => {
+        fetch("https://pqt-calva-ws.onrender.com/api/salidas",{
+            method: "GET",
+            redirect: "follow"
+        }).then(async(response) => {
+            const codigo = response.status;
+            const data = await response.json();
+            return { codigo, data };
+        }).then((result) => {
+            console.log(result)
+            if(result.codigo == 200){
+                setSalidas(result.data);
+                setLoading(true);
+            }
+        }).catch((error) => {
+            console.error(error)
+        });
+    };
+
     useEffect(() => {
-        console.log(SALIDAS_LOCAL)
+        getSalidas();
     }, []);
 
     const Item = ({ item, index }: { item: any; index: number }): React.ReactElement => (
@@ -48,9 +68,12 @@ export const HomeScreen = ({ route, navigation }: any) => {
             <Header />
 
             {
-                SALIDAS_LOCAL.length > 0 ?
+                loading ?
+                <>
+                {
+                    salidas.length > 0 ?
                     <FlatList
-                        data={SALIDAS_LOCAL}
+                        data={salidas}
                         renderItem={({ item, index }) => <Item item={item} index={index} />}
                         keyExtractor={(item: any) => item._id}
                     /> :
@@ -66,7 +89,11 @@ export const HomeScreen = ({ route, navigation }: any) => {
                             No existen salidas registradas.
                         </Text>
                     </View>
-
+                }
+                </>:
+                <View style={{ alignContent: 'center', marginTop: 150 }}>
+                    <ActivityIndicator animating={true} color={'#004389'} size={50} />
+                </View>
             }
 
             <BottomBarNav navigation={navigation} />

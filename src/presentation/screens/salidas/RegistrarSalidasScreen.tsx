@@ -47,8 +47,15 @@ export const RegistrarSalidasScreen = ({ route, navigation }: any) => {
             return;
         }
 
+        const salida = JSON.stringify({
+            "destino":txtSelect,
+            "fecha": txtSelectFecha,
+            "status": 'Pendiente'
+        });
 
-        const salida: any = [{
+        createSalida(salida);
+
+        /*const salida: any = [{
             _id: Date.now().toString(),
             destino:txtSelect,
             fecha: txtSelectFecha,
@@ -57,6 +64,7 @@ export const RegistrarSalidasScreen = ({ route, navigation }: any) => {
 
         const doSalida = await insertSalida(salida);
         console.log("🚀 ~ addSalida ~ doSalida:", doSalida)
+
         if(doSalida == 1){
             setAcept(doSalida);
             setMessage('¡Registro exitoso!');
@@ -66,8 +74,39 @@ export const RegistrarSalidasScreen = ({ route, navigation }: any) => {
             setMessage('¡Registro erróneo!');
             showAlert();
             return;
-        }
+        }*/
     };
+
+    const createSalida = async (salida: any) => {
+        console.log("🚀 ~ createSalida ~ salida:", salida);
+        const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+
+        fetch("https://pqt-calva-ws.onrender.com/api/salidas", {
+            method: "POST",
+            headers: myHeaders,
+            body: salida,
+            redirect: "follow"
+        }).then(async(response) => {
+            const codigo = response.status;
+            const texto = await response.text();
+            return { codigo, texto };
+        }).then((result) => {
+            console.log(result);
+            if(result.codigo == 201){
+                setAcept(1);
+                setMessage('¡La salida se registró exitosamente!');
+                showAlert();
+            }else{
+                setAcept(0);
+                setMessage('¡Ocurrió un error al registrar la salida!');
+                showAlert();
+            }
+        }).catch((error) => {
+            console.error(error)
+        });
+    
+    }
 
     const renderOption = ({ id, descripcion }: any) => (
         <List.Item

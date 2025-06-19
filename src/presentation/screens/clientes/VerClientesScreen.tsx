@@ -1,13 +1,19 @@
 import React, { useEffect, useState } from 'react';
-import { FlatList, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
+import { FlatList, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, useWindowDimensions, View } from 'react-native';
 import { Header } from '../../components/header/Header';
 import { ClientesModel } from '../../../core/models/ClientesModel';
 import { useQuery } from '@realm/react';
-import { Appbar, Button, Card, Checkbox, FAB, List, TextInput } from 'react-native-paper';
+import { ActivityIndicator, Appbar, Button, Card, Checkbox, FAB, List, TextInput } from 'react-native-paper';
 import FastImage from 'react-native-fast-image';
 import { useClientesLocal } from '../../../hooks/database/clientes/useClientesLocal';
+import { ImageLibraryOptions, launchCamera, launchImageLibrary } from 'react-native-image-picker';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { BottomBarNav } from '../../components/bottomBarNav/BottomBarNav';
+import { useIsFocused } from '@react-navigation/native';
+import { disableBack } from '../utils/Utils';
 
-const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, clasif, updateCliente }: any): React.ReactElement => (
+const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, /*clasif,*/ updateCliente, navigation }: any): React.ReactElement => (
     <Card style={[styles.card, { backgroundColor: item.status === 'Entregado' ? '#ebfbd8' : '#FFF' }]} >
 
         <Card.Content>
@@ -17,8 +23,18 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, cl
                 <View>
 
                     <View style={{ flexDirection: 'row' }}>
+                        <Text style={[styles.label, { width: width * 0.23 }]}>Número: </Text>
+                        <Text style={styles.value}>{`${item.numero}`}</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row' }}>
                         <Text style={[styles.label, { width: width * 0.23 }]}>Envia: </Text>
-                        <Text style={styles.value}>{`${item.nombre} ${item.apellidos}`}</Text>
+                        <Text style={styles.value}>{`${item.nombre}`}</Text>
+                    </View>
+
+                    <View style={{ flexDirection: 'row' }}>
+                        <Text style={[styles.label, { width: width * 0.23 }]}>Dirección: </Text>
+                        <Text style={styles.value}>{`${item.direccion}`}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row' }}>
@@ -26,7 +42,7 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, cl
                         <Text style={styles.value}>{`${item.tel}`}</Text>
                     </View>
 
-                    <View style={{ flexDirection: 'row' }}>
+                    {/*<View style={{ flexDirection: 'row' }}>
                         <Text style={[styles.label, { width: width * 0.23 }]}>Paquete: </Text>
                         <Text style={styles.value}>{`${item.descripcionPaquete}`}</Text>
                     </View>
@@ -34,7 +50,7 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, cl
                     <View style={{ flexDirection: 'row' }}>
                         <Text style={[styles.label, { width: width * 0.23 }]}>Estatus: </Text>
                         <Text style={styles.value}>{`${item.status}`}</Text>
-                    </View>
+                    </View>*/}
 
                 </View>
 
@@ -54,12 +70,12 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, cl
             {
                 (itemActivo === index) &&
                 <View style={{ paddingTop: 10 }} >
-                    <View style={{ flex: 1, backgroundColor: '#F6F6F6', borderRadius: 5, paddingTop: 16 }}>
+                    <View style={{ flex: 1, backgroundColor: '#F6F6F6', borderRadius: 5, paddingTop: 16, paddingBottom: 16 }}>
 
                         <View style={{ marginHorizontal: 16 }}>
                             <View style={{ flexDirection: 'row' }}>
                                 <Text style={[styles.label, { width: width * 0.23 }]}>Recibe: </Text>
-                                <Text style={styles.value}>{`${item.nombreRecibe} ${item.apellidosRecibe}`}</Text>
+                                <Text style={styles.value}>{`${item.nombreRecibe}`}</Text>
                             </View>
                             <View style={{ flexDirection: 'row' }}>
                                 <Text style={[styles.label, { width: width * 0.23 }]}>Teléfono: </Text>
@@ -69,12 +85,28 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, cl
                                 <Text style={[styles.label, { width: width * 0.23 }]}>Dirección: </Text>
                                 <Text style={styles.value}>{`${item.direccionRecibe}`}</Text>
                             </View>
-                            <View style={{ flexDirection: 'row' }}>
-                                <Text style={[styles.label, { width: width * 0.23 }]}>Municipio/Condado: </Text>
-                                <Text style={styles.value}>{`${item.municipioRecibe}`}</Text>
+
+                            <View style={{ marginTop: 15, marginHorizontal: 40 }}>
+                                <Button 
+                                    icon="gift" 
+                                    mode="contained" 
+                                    onPress={() => {
+                                        navigation.navigate('AddPaquete', { item: item });
+                                    }}
+                                    style={{ borderRadius: 10 }}
+                                    buttonColor='#004389'
+                                    textColor='#FFF'
+                                >
+                                    Agregar paquete
+                                </Button>
                             </View>
 
-                            <View style={{ flexDirection: 'row' }}>
+                            {/*<View style={{ flexDirection: 'row' }}>
+                                <Text style={[styles.label, { width: width * 0.23 }]}>Municipio/Condado: </Text>
+                                <Text style={styles.value}>{`${item.municipioRecibe}`}</Text>
+                            </View>*/}
+
+                            {/*<View style={{ flexDirection: 'row' }}>
                                 <Text style={[styles.label, { width: width * 0.2 }]}>Entregado: </Text>
                                 <View style={{ top: -7 }}>
                                     <Checkbox
@@ -122,14 +154,15 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, cl
                                         color='#004389'
                                     />
                                 </View>
-                            </View>
+                            </View>*/}
+
                         </View>
 
-                        <Text style={{ textAlign: 'center', fontWeight: '700', fontSize: 16, color: '#004389' }}>
+                        {/*<Text style={{ textAlign: 'center', fontWeight: '700', fontSize: 16, color: '#004389' }}>
                             {`\nFoto(s) \n`}
-                        </Text>
+                        </Text>*/}
 
-                        <View>
+                        {/*<View>
                             {
                                 item.fotos.map((val: any, index: number) => (
                                     <View key={index.toString()} style={{ alignItems: 'center', marginBottom: 20 }}>
@@ -149,7 +182,7 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, cl
 
                             }
 
-                        </View>
+                        </View>*/}
 
                     </View>
                 </View>
@@ -170,13 +203,19 @@ export default React.memo(Item, (prevProps, nextProps) => {
 
 export const VerClientesScreen = ({ route, navigation }: any) => {
 
-    const { destino, fecha, clasif } = route.params;
+    const isFocused = useIsFocused();
+    const isAndroid15 = Platform.OS === 'android' && Platform.Version >= 34;
+    console.log("🚀 ~ VerClientesScreen ~ isAndroid15:", isAndroid15)
+
+    //const { destino, fecha, clasif } = route.params;
     const { width, height } = useWindowDimensions();
     const CLIENTES_LOCAL = useQuery(ClientesModel);
     const { updateCliente } = useClientesLocal();
     const [itemActivo, setItemActivo] = useState<number | null>(null);
     const [clientes, setClientes] = useState([]);
     const [oClienteAux, setOclienteAux] = useState<any>([]);
+
+    const [loading, setLoading] = useState(false);
 
     const [modoBusqueda, setModoBusqueda] = useState(false);
     const [textoBusqueda, setTextoBusqueda] = useState('');
@@ -201,7 +240,8 @@ export const VerClientesScreen = ({ route, navigation }: any) => {
 
                 if (
                     item.nombre.toLowerCase().includes(text.toLowerCase()) ||
-                    item.status.toLowerCase().includes(text.toLowerCase())
+                    //item.status.toLowerCase().includes(text.toLowerCase()) ||
+                    item.numero.toLowerCase().includes(text.toLowerCase())
                 ) {
                     return item;
                 }
@@ -218,41 +258,71 @@ export const VerClientesScreen = ({ route, navigation }: any) => {
     const toggleTarjeta = (index: number) => setItemActivo(prev => (prev === index ? null : index));
 
     const goToAddClientes = () => {
-        navigation.navigate('AddCliente', { destino: destino, fecha: fecha, clasif: clasif });
+        //navigation.navigate('AddCliente', { destino: destino, fecha: fecha, clasif: clasif });
+        navigation.navigate('AddCliente');
     }
 
     const goToClasificaciones = () => {
-        navigation.navigate('Clasificaciones', { destino: destino, fecha: fecha });
+        navigation.navigate('Clasificaciones');
+        //navigation.navigate('Clasificaciones', { destino: destino, fecha: fecha });
     }
 
-    const getClientes = (clasificacion: string) => {
+    /*const getClientes = (clasificacion: string) => {
         const filtrados = CLIENTES_LOCAL.filtered('clasificacion == $0', clasificacion);
         return Array.from(filtrados);
-    }
+    }*/
+
+    const getClientes = async () => {
+        console.log("🚀 ~ getClientes ~ getClientes:")
+        fetch("https://pqt-calva-ws.onrender.com/api/cliente", {
+            method: "GET",
+            redirect: "follow"
+        }).then(async (response) => {
+            const codigo = response.status;
+            const data = await response.json();
+            return { codigo, data };
+        }).then((result) => {
+            console.log(result)
+            if (result.codigo == 200) {
+                console.log("🚀 ~ getClientes ~ result.data:", result.data)
+                setClientes(result.data);
+                setOclienteAux(result.data);
+                setLoading(true);
+            }
+
+        }).catch((error) => {
+            console.error(error)
+        });
+    };
 
     useEffect(() => {
-        if (CLIENTES_LOCAL.length > 0) {
-            const oClientes: any = getClientes(clasif);
-            setClientes(oClientes);
-            setOclienteAux(oClientes)
-        } else {
-            setClientes([]);
-        }
-
-    }, []);
+        disableBack();
+        getClientes();
+    }, [isFocused]);
 
     return (
-        <View style={{ flex: 1, backgroundColor: '#FFF' }}>
-            <Header />
+        <SafeAreaView style={{ flex: 1, backgroundColor: '#FFF' }} edges={['top', 'bottom']}>
+            <View style={{ flex: 1, backgroundColor: '#FFF' }}>
+                <Header />
 
-            {
-                clientes.length > 0 ?
-                    <View style={{ flex: 1, marginHorizontal: 16 }}>
+                {
+                    loading ?
+                    <>
+                    {
+                        clientes.length > 0 ?
+                        <View style={{ flex: 1, marginHorizontal: 16 }}>
 
-                        <Appbar.Header style={{ backgroundColor: '#F6F6F6', height: 50, borderRadius: 10 }}>
-                            {modoBusqueda ? (
+                            <Appbar.Header
+                                style={{
+                                    backgroundColor: '#F6F6F6',
+                                    height: 50,
+                                    borderRadius: 10,
+                                }}
+                                statusBarHeight={0}
+                            >
+                                {modoBusqueda ? (
                                 <>
-                                    <Appbar.Action icon="close" color='#004389' onPress={_handleCloseSearch} />
+                                <Appbar.Action icon="close" color='#004389' onPress={_handleCloseSearch} />
                                     <TextInput
                                         placeholder="Buscar cliente"
                                         placeholderTextColor={"#004389"}
@@ -268,69 +338,60 @@ export const VerClientesScreen = ({ route, navigation }: any) => {
                                         }}
                                     />
                                 </>
-                            ) : (
+                                ) : (
                                 <>
-                                    <Appbar.Content
-                                        title="            Buscar cliente"
-                                        titleStyle={{
-                                            fontSize: 17,
-                                            textAlign: 'center',
-                                            color: '#004389'
-                                        }}
-                                        style={{ backgroundColor: '#F6F6F6' }}
-                                    />
+                                <Appbar.Content
+                                    title="            Buscar cliente"
+                                    titleStyle={{
+                                        fontSize: 17,
+                                        textAlign: 'center',
+                                        color: '#004389'
+                                    }}
+                                    style={{ backgroundColor: '#F6F6F6' }}
+                                />
                                     <Appbar.Action icon="magnify" color='#004389' onPress={_handleSearch} />
                                 </>
-                            )}
-                        </Appbar.Header>
+                                )}
+                            </Appbar.Header>
 
-                        <FlatList
-                            data={clientes}
-                            renderItem={({ item, index }) =>
-                                <View style={{ marginTop: 14 }}>
-                                    <Item
-                                        item={item}
-                                        index={index}
-                                        itemActivo={itemActivo}
-                                        toggleTarjeta={toggleTarjeta}
-                                        setItemActivo={setItemActivo}
-                                        width={width}
-                                        clasif={clasif}
-                                        updateCliente={updateCliente}
-                                    />
-                                </View>
-                            }
-                            keyExtractor={(item: any) => item._id}
-                        />
-                        <FAB
-                            icon="account-plus"
-                            style={styles.fab}
-                            onPress={goToAddClientes}
-                        />
-                        <FAB
-                            icon="keyboard-backspace"
-                            style={styles.fabLeft}
-                            onPress={goToClasificaciones}
-                        />
-                    </View>
-                    : <View style={{ flex: 1 }}>
-                        <View style={{ marginTop: 200 }}>
-                            <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '700', color: '#004389' }}>No existen clientes para esta salida</Text>
+                            <FlatList
+                                data={clientes}
+                                renderItem={({ item, index }) =>
+                                    <View style={{ marginTop: 10 }}>
+                                        <Item
+                                            item={item}
+                                            index={index}
+                                            itemActivo={itemActivo}
+                                            toggleTarjeta={toggleTarjeta}
+                                            setItemActivo={setItemActivo}
+                                            width={width}
+                                            //clasif={clasif}
+                                            updateCliente={updateCliente}
+                                            navigation={navigation}
+                                        />
+                                    </View>
+                                }
+                                keyExtractor={(item: any) => item._id}
+                                style={{ flex: 1, marginBottom: 100 }}
+                            />
+
+                        </View>:
+                        <View style={{ flex: 1 }}>
+                            <View style={{ marginTop: 250 }}>
+                                <Text style={{ textAlign: 'center', fontSize: 16, fontWeight: '700', color: '#004389' }}>No existen clientes registrados.</Text>
+                            </View>
                         </View>
-                        <FAB
-                            icon="account-plus"
-                            style={styles.fab}
-                            onPress={goToAddClientes}
-                        />
-                        <FAB
-                            icon="keyboard-backspace"
-                            style={styles.fabLeft}
-                            onPress={goToClasificaciones}
-                        />
-                    </View>
-            }
+                    }
 
-        </View>
+                    <BottomBarNav navigation={navigation} />
+                    </> :
+                    <View style={{ justifyContent: 'center', alignContent: 'center', marginTop: 250 }}>
+                        <ActivityIndicator animating={true} color={'#004389'} size={50} />
+                    </View>
+                }
+
+            </View>
+        </SafeAreaView>
     )
 }
 

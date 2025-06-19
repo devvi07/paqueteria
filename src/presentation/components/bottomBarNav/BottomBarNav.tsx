@@ -1,8 +1,11 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from 'react-native-paper';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const BottomBarNav = ({ navigation }: any) => {
+
+    const insets = useSafeAreaInsets();
 
     const addCliente = () => {
 
@@ -12,23 +15,35 @@ export const BottomBarNav = ({ navigation }: any) => {
     const logOut = () => navigation.navigate('Login');
 
     const goToHome = () => navigation.navigate('Home');
-
+    const goToClientesRegister = () => navigation.navigate('ClientesRegister');
+    
     return (
-        <View style={styles.container}>
-            <View style={[styles.innerContainer, { gap: 50 }]}>
+        <View style={[ styles.container, { /*bottom: insets.bottom*/ } ]}>
+            <View style={[styles.innerContainer, { gap: 100 }]}>
 
-                <TouchableOpacity onPress={ registrarSalida }>
+                <TouchableOpacity onPress={ goToClientesRegister }>
+                    <View style={{ alignItems: 'center', padding: 7 }}>
+                        <Icon
+                            source="account-multiple-plus"
+                            color={'#004389'}
+                            size={40}
+                        />
+                        <Text style={{ color: '#004389', fontWeight: '700' }}>Clientes</Text>
+                    </View>
+                </TouchableOpacity>
+                
+                {/*<TouchableOpacity onPress={ registrarSalida }>
                     <View style={{ alignItems: 'center', padding: 7 }}>
                         <Icon
                             source="airplane-plus"
                             color={'#004389'}
                             size={40}
                         />
-                        <Text style={{ color: '#004389', fontWeight: '700' }}>Agregar</Text>
+                        <Text style={{ color: '#004389', fontWeight: '700' }}>Salidas</Text>
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity>*/}
 
-                <TouchableOpacity>
+                {/*<TouchableOpacity>
                     <View style={{ alignItems: 'center', padding: 7 }}>
                         <Icon
                             source="cloud-sync"
@@ -37,7 +52,7 @@ export const BottomBarNav = ({ navigation }: any) => {
                         />
                         <Text style={{ color: '#004389', fontWeight: '700' }}>Sincronizar</Text>
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity>*/}
 
                 <TouchableOpacity onPress={ logOut }>
                     <View style={{ alignItems: 'center', padding: 7 }}>

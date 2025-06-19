@@ -1,4 +1,4 @@
-import { Platform } from "react-native";
+import { BackHandler, Platform } from "react-native";
 import { requestMultiple, PERMISSIONS, RESULTS, openSettings } from 'react-native-permissions';
 
 export const requestAllPermissions = async () => {
@@ -36,4 +36,11 @@ export const requestAllPermissions = async () => {
     }*/
     console.log('Algunos permisos fueron denegados');
   }
+};
+
+export const disableBack = () => {
+  const backHandler = BackHandler.addEventListener('hardwareBackPress', () => {
+    return true;
+  });
+  return () => backHandler.remove();
 };
