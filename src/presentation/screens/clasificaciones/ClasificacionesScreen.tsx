@@ -3,11 +3,13 @@ import { FlatList, Image, StyleSheet, Text, useWindowDimensions, View } from 're
 import { Card, FAB, Icon } from 'react-native-paper';
 import { Header } from '../../components/header/Header';
 import { BottomBarNav } from '../../components/bottomBarNav/BottomBarNav';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const ClasificacionesScreen = ({ route, navigation }: any) => {
 
     const { destino, fecha } = route.params;
     const { width, height } = useWindowDimensions();
+    const insets = useSafeAreaInsets();
 
     const CAT_CLASIFICACIONES = [
         { id: 1, descripcion: 'FRIO', left: 80, img: require(`../../../assets/img/hielera.jpg`)},
@@ -54,7 +56,7 @@ export const ClasificacionesScreen = ({ route, navigation }: any) => {
             />
             <FAB
                 icon="keyboard-backspace"
-                style={styles.fab}
+                style={[ styles.fab, { bottom: insets.bottom } ]}
                 onPress={()=>{
                     navigation.navigate('Home');
                 }}

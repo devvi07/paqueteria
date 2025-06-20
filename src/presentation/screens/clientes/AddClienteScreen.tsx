@@ -148,7 +148,23 @@ export const AddClienteScreen = ({ route, navigation }: any) => {
             }
 
             setPhotoDescription('');
-                
+
+            /*const data = new FormData();
+            data.append('file', {
+                uri: uri,
+                type: type,
+                name: fileName,
+            });
+            data.append('upload_preset', 'pqt-calva'); // lo configuras en Cloudinary
+
+            const res = await fetch('https://api.cloudinary.com/v1_1/dyfx8jypt/image/upload', {
+                method: 'POST',
+                body: data,
+            });
+
+            const json = await res.json();
+            return json.secure_url; // esta es la URL para guardar
+            */  
         }
     
     }

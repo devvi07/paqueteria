@@ -4,19 +4,26 @@ import { Icon } from 'react-native-paper';
 
 export const BottomBarNav = ({ navigation }: any) => {
 
-    const addCliente = () => {
-
-    }
-
-    const registrarSalida = () => navigation.navigate('RegistrarSalida');
+    const registrarSalida = () => navigation.navigate('NvaSalida');
     const logOut = () => navigation.navigate('Login');
-
     const goToHome = () => navigation.navigate('Home');
-
+    const goToClientesRegister = () => navigation.navigate('ClientesRegister');
+    
     return (
-        <View style={styles.container}>
-            <View style={[styles.innerContainer, { gap: 50 }]}>
+        <View style={[ styles.container, { /*bottom: insets.bottom*/ } ]}>
+            <View style={[styles.innerContainer, { gap: 70 }]}>
 
+                <TouchableOpacity onPress={ goToClientesRegister }>
+                    <View style={{ alignItems: 'center', padding: 7 }}>
+                        <Icon
+                            source="account-multiple-plus"
+                            color={'#004389'}
+                            size={40}
+                        />
+                        <Text style={{ color: '#004389', fontWeight: '700' }}>Clientes</Text>
+                    </View>
+                </TouchableOpacity>
+                
                 <TouchableOpacity onPress={ registrarSalida }>
                     <View style={{ alignItems: 'center', padding: 7 }}>
                         <Icon
@@ -24,11 +31,11 @@ export const BottomBarNav = ({ navigation }: any) => {
                             color={'#004389'}
                             size={40}
                         />
-                        <Text style={{ color: '#004389', fontWeight: '700' }}>Agregar</Text>
+                        <Text style={{ color: '#004389', fontWeight: '700' }}>Crear salida</Text>
                     </View>
                 </TouchableOpacity>
 
-                <TouchableOpacity>
+                {/*<TouchableOpacity>
                     <View style={{ alignItems: 'center', padding: 7 }}>
                         <Icon
                             source="cloud-sync"
@@ -37,7 +44,7 @@ export const BottomBarNav = ({ navigation }: any) => {
                         />
                         <Text style={{ color: '#004389', fontWeight: '700' }}>Sincronizar</Text>
                     </View>
-                </TouchableOpacity>
+                </TouchableOpacity>*/}
 
                 <TouchableOpacity onPress={ logOut }>
                     <View style={{ alignItems: 'center', padding: 7 }}>
