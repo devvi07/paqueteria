@@ -1,25 +1,17 @@
 import React from 'react'
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Icon } from 'react-native-paper';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const BottomBarNav = ({ navigation }: any) => {
 
-    const insets = useSafeAreaInsets();
-
-    const addCliente = () => {
-
-    }
-
-    const registrarSalida = () => navigation.navigate('RegistrarSalida');
+    const registrarSalida = () => navigation.navigate('NvaSalida');
     const logOut = () => navigation.navigate('Login');
-
     const goToHome = () => navigation.navigate('Home');
     const goToClientesRegister = () => navigation.navigate('ClientesRegister');
     
     return (
         <View style={[ styles.container, { /*bottom: insets.bottom*/ } ]}>
-            <View style={[styles.innerContainer, { gap: 100 }]}>
+            <View style={[styles.innerContainer, { gap: 70 }]}>
 
                 <TouchableOpacity onPress={ goToClientesRegister }>
                     <View style={{ alignItems: 'center', padding: 7 }}>
@@ -32,16 +24,16 @@ export const BottomBarNav = ({ navigation }: any) => {
                     </View>
                 </TouchableOpacity>
                 
-                {/*<TouchableOpacity onPress={ registrarSalida }>
+                <TouchableOpacity onPress={ registrarSalida }>
                     <View style={{ alignItems: 'center', padding: 7 }}>
                         <Icon
                             source="airplane-plus"
                             color={'#004389'}
                             size={40}
                         />
-                        <Text style={{ color: '#004389', fontWeight: '700' }}>Salidas</Text>
+                        <Text style={{ color: '#004389', fontWeight: '700' }}>Crear salida</Text>
                     </View>
-                </TouchableOpacity>*/}
+                </TouchableOpacity>
 
                 {/*<TouchableOpacity>
                     <View style={{ alignItems: 'center', padding: 7 }}>

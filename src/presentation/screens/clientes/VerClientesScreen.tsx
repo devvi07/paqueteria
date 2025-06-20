@@ -13,8 +13,17 @@ import { BottomBarNav } from '../../components/bottomBarNav/BottomBarNav';
 import { useIsFocused } from '@react-navigation/native';
 import { disableBack } from '../utils/Utils';
 
-const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, /*clasif,*/ updateCliente, navigation }: any): React.ReactElement => (
-    <Card style={[styles.card, { backgroundColor: item.status === 'Entregado' ? '#ebfbd8' : '#FFF' }]} >
+const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, /*clasif,*/ updateCliente, navigation, setLoading, getClientes }: any): React.ReactElement => (
+    <Card 
+        style={[
+            styles.card, 
+            { 
+                backgroundColor: 
+                    item.status === 'Entregado' ? '#C62828' : 
+                    item.status === 'Pendiente' ? '#00000029' :'#FFF' 
+            }
+        ]} 
+    >
 
         <Card.Content>
 
@@ -23,28 +32,28 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, /*
                 <View>
 
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={[styles.label, { width: width * 0.23 }]}>Número: </Text>
-                        <Text style={styles.value}>{`${item.numero}`}</Text>
+                        <Text style={[styles.label, { width: width * 0.23, color: item.status === 'Entregado' ? '#FFF': "#333" }]}>Número: </Text>
+                        <Text style={[styles.value, { color: item.status === 'Entregado' ? '#FFF': "#333" }]}>{`${item.numero}`}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={[styles.label, { width: width * 0.23 }]}>Envia: </Text>
-                        <Text style={styles.value}>{`${item.nombre}`}</Text>
+                        <Text style={[styles.label, { width: width * 0.23, color: item.status === 'Entregado' ? '#FFF': "#333" }]}>Envia: </Text>
+                        <Text style={[styles.value, { color: item.status === 'Entregado' ? '#FFF': "#333" }]}>{`${item.nombre}`}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={[styles.label, { width: width * 0.23 }]}>Dirección: </Text>
-                        <Text style={styles.value}>{`${item.direccion}`}</Text>
+                        <Text style={[styles.label, { width: width * 0.23, color: item.status === 'Entregado' ? '#FFF': "#333" }]}>Dirección: </Text>
+                        <Text style={[styles.value, { color: item.status === 'Entregado' ? '#FFF': "#333" }]}>{`${item.direccion}`}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row' }}>
-                        <Text style={[styles.label, { width: width * 0.23 }]}>Teléfono: </Text>
-                        <Text style={styles.value}>{`${item.tel}`}</Text>
+                        <Text style={[styles.label, { width: width * 0.23, color: item.status === 'Entregado' ? '#FFF': "#333" }]}>Teléfono: </Text>
+                        <Text style={[styles.value, { color: item.status === 'Entregado' ? '#FFF': "#333" }]}>{`${item.tel}`}</Text>
                     </View>
 
                     {/*<View style={{ flexDirection: 'row' }}>
                         <Text style={[styles.label, { width: width * 0.23 }]}>Paquete: </Text>
-                        <Text style={styles.value}>{`${item.descripcionPaquete}`}</Text>
+                        <Text style={styles.value}>{`${item.descPaquete}`}</Text>
                     </View>
 
                     <View style={{ flexDirection: 'row' }}>
@@ -60,7 +69,7 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, /*
                 <TextInput.Icon
                     icon={itemActivo === index ? 'chevron-up-circle' : 'chevron-right-circle'}
                     size={27}
-                    color={itemActivo === index ? '#004389' : '#707070'}
+                    color={itemActivo === index ? '#004389' : item.status === 'Entregado' ? '#FFF' :'#707070'}
                     onPress={() => {
                         toggleTarjeta(index);
                     }}
@@ -86,103 +95,162 @@ const Item = ({ item, index, itemActivo, toggleTarjeta, setItemActivo, width, /*
                                 <Text style={styles.value}>{`${item.direccionRecibe}`}</Text>
                             </View>
 
-                            <View style={{ marginTop: 15, marginHorizontal: 40 }}>
-                                <Button 
-                                    icon="gift" 
-                                    mode="contained" 
-                                    onPress={() => {
-                                        navigation.navigate('AddPaquete', { item: item });
-                                    }}
-                                    style={{ borderRadius: 10 }}
-                                    buttonColor='#004389'
-                                    textColor='#FFF'
-                                >
-                                    Agregar paquete
-                                </Button>
+                            {
+                                item.descPaquete == "NA" ?
+                                <View style={{ marginTop: 15, marginHorizontal: 40 }}>
+                                    <Button 
+                                        icon="gift" 
+                                        mode="contained" 
+                                        onPress={() => {
+                                            navigation.navigate('AddPaquete', { item: item });
+                                        }}
+                                        style={{ borderRadius: 10 }}
+                                        buttonColor='#004389'
+                                        textColor='#FFF'
+                                    >
+                                        Agregar paquete
+                                    </Button>
+                                </View>:
+                                <View style={{ marginTop: 15 }}>
+
+                                    <View>
+                                        <View style={{ borderWidth: 0.2, borderColor:'#707070', width: '100%'}} />
+                                    </View>
+
+                                    <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                                        <Text style={[styles.label, { width: width * 0.23 }]}>Paquete: </Text>
+                                        <Text style={styles.value}>{`${item.descPaquete}`}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: 'row'}}>
+                                        <Text style={[styles.label, { width: width * 0.23 }]}>Clasif: </Text>
+                                        <Text style={styles.value}>{`${item.clasificacion}`}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text style={[styles.label, { width: width * 0.23 }]}>Destino: </Text>
+                                        <Text style={styles.value}>{`${item.destino}`}</Text>
+                                    </View>
+                                    <View style={{ flexDirection: 'row' }}>
+                                        <Text style={[styles.label, { width: width * 0.23 }]}>Estatus: </Text>
+                                        <Text style={[styles.value, { color: '#004389' }]}>{`${item.status.toUpperCase()}`}</Text>
+                                    </View>
+
+                                    {
+                                        item.status == 'Pendiente' &&
+                                        <View style={{ flexDirection: 'row', marginTop: 10 }}>
+                                            <Text style={[styles.label, { width: width * 0.2 }]}>Entregar: </Text>
+                                            <View style={{ top: -7 }}>
+                                                <Checkbox
+                                                    status={item.status == 'Entregado' ? 'checked' : 'unchecked'}
+                                                    onPress={async() => {
+                                            
+                                                        console.log('Marcar como entregado');
+                                            
+                                                        const cliente = {  
+                                                            "status": "Entregado" 
+                                                        };
+
+                                                        setLoading(false);
+                                                        setItemActivo(null);
+
+                                                        const response = await fetch(`https://pqt-calva-ws.onrender.com/api/cliente/${item._id}`, {
+                                                            method: 'PUT',
+                                                            headers: {
+                                                                'Content-Type': 'application/json'
+                                                            },
+                                                            body: JSON.stringify(cliente)
+                                                        });
+
+                                                        const data = await response.json();
+                                                        console.log("🚀 ~ addPaquete ~ data:", data)
+                                                        if(data){
+                                                            getClientes();
+                                                        }
+                                                    }}
+                                                    disabled={item.status == 'Entregado'}
+                                                    color='#004389'
+                                                />
+                                            </View>
+                                        </View>
+                                    }
+                                    
+                                    <View style={{ marginTop: 15 }}>
+                                        <Text style={{ textAlign: 'center', color: '#004389', fontSize: 16, fontWeight: '600' }}>Foto(s)</Text>
+                                    </View>
+
+                                    <View style={{ marginTop: 15 }}>
+                                    {
+                                        item.fotos.split(',').map((val: any, index: number) => (
+                                        <View key={index.toString()} style={{ alignItems: 'center', marginBottom: 20 }}>
+                                            <TouchableOpacity onPress={()=>{ navigation.navigate('PhotoScreen', {photo: val}) }}>
+                                                <FastImage
+                                                    style={{ width: 250, height: 200, borderRadius: 10 }}
+                                                    source={{
+                                                        uri: `${val}`,
+                                                        priority: FastImage.priority.normal,
+                                                    }}
+                                                    resizeMode={FastImage.resizeMode.cover}
+                                                />
+                                            </TouchableOpacity>
+                                        </View>
+                                        ))
+                                    }
+                                    </View>
+
+                                </View>
+                            }
+                            
+                            <View style={{ marginTop: 15 }}>
+                                <View style={{ borderWidth: 0.2, borderColor:'#707070', width: '100%'}} />
                             </View>
 
-                            {/*<View style={{ flexDirection: 'row' }}>
-                                <Text style={[styles.label, { width: width * 0.23 }]}>Municipio/Condado: </Text>
-                                <Text style={styles.value}>{`${item.municipioRecibe}`}</Text>
-                            </View>*/}
+                            <View style={{ marginTop: 15, marginHorizontal: 40 }}>
+                                <Button 
+                                    icon="lead-pencil" 
+                                    mode="contained" 
+                                    onPress={() => {
+                                        navigation.navigate('EditarCliente', { item: item });
+                                    }}
+                                    style={{ borderRadius: 10 }}
+                                    buttonColor='#4CAF50'
+                                    textColor='#FFF'
+                                >
+                                    Editar cliente
+                                </Button>
+                            </View>
+                            
+                            <View style={{ marginTop: 15, marginHorizontal: 40 }}>
+                                <Button 
+                                    icon="trash-can" 
+                                    mode="contained" 
+                                    onPress={async() => {
 
-                            {/*<View style={{ flexDirection: 'row' }}>
-                                <Text style={[styles.label, { width: width * 0.2 }]}>Entregado: </Text>
-                                <View style={{ top: -7 }}>
-                                    <Checkbox
-                                        status={item.status == 'Entregado' ? 'checked' : 'unchecked'}
-                                        onPress={() => {
-                                            console.log('Marcar como entregado');
-                                            const oPhotos = [];
+                                        setLoading(false);
+                                        setItemActivo(null);
 
-                                            for (const photo of item.fotos) {
-                                                oPhotos.push({
-                                                    _id: photo._id,
-                                                    url: photo.url,
-                                                    uri: photo.uri,
-                                                    type: photo.type,
-                                                    namePhoto: photo.namePhoto,
-                                                    descripcion: photo.descripcion,
-                                                })
-                                            }
+                                        const response = await fetch(`https://pqt-calva-ws.onrender.com/api/cliente/${item._id}`, {
+                                            method: 'DELETE',
+                                            headers: {
+                                                'Content-Type': 'application/json'
+                                            },
+                                        });
 
-                                            const oCliente: any = [{
-                                                _id: item._id,
-                                                nombre: item.nombre,
-                                                apellidos: item.apellidos,
-                                                direccion: item.direccion,
-                                                municipio: item.municipio,
-                                                tel: item.tel,
-                                                destino: item.destino,
-                                                fecha: item.fecha,
-                                                descripcionPaquete: item.descripcionPaquete,
-                                                fotos: oPhotos,
-                                                nombreRecibe: item.nombreRecibe,
-                                                apellidosRecibe: item.apellidosRecibe,
-                                                direccionRecibe: item.direccionRecibe,
-                                                telRecibe: item.telRecibe,
-                                                municipioRecibe: item.municipioRecibe,
-                                                clasificacion: clasif,
-                                                status: 'Entregado'
-                                            }];
-                                            console.log("🚀 ~ oCliente:", oCliente)
-                                            const doUpdate = updateCliente(oCliente);
-                                            setItemActivo(null);
-                                            console.log("🚀 ~ onPress={async ~ doUpdate:", doUpdate);
-                                        }}
-                                        disabled={item.status == 'Entregado'}
-                                        color='#004389'
-                                    />
-                                </View>
-                            </View>*/}
+                                        const data = await response.json();
+                                        console.log("🚀 ~ deleteCliente ~ data:", data)
+                                        if(data){
+                                            getClientes();
+                                        }
+
+                                    }}
+                                    style={{ borderRadius: 10 }}
+                                    buttonColor='#C62828'
+                                    textColor='#FFF'
+                                >
+                                    Eliminar cliente
+                                </Button>
+                            </View>
+                            
 
                         </View>
-
-                        {/*<Text style={{ textAlign: 'center', fontWeight: '700', fontSize: 16, color: '#004389' }}>
-                            {`\nFoto(s) \n`}
-                        </Text>*/}
-
-                        {/*<View>
-                            {
-                                item.fotos.map((val: any, index: number) => (
-                                    <View key={index.toString()} style={{ alignItems: 'center', marginBottom: 20 }}>
-                                        <TouchableOpacity>
-                                            <FastImage
-                                                style={{ width: 250, height: 200, borderRadius: 10 }}
-                                                source={{
-                                                    uri: `${val.uri}`,
-                                                    priority: FastImage.priority.normal,
-                                                }}
-                                                resizeMode={FastImage.resizeMode.cover}
-                                            />
-                                            <Text style={{ color: '#004389', fontWeight: '700', fontSize: 16, textAlign: 'center' }}>{val.descripcion}</Text>
-                                        </TouchableOpacity>
-                                    </View>
-                                ))
-
-                            }
-
-                        </View>*/}
 
                     </View>
                 </View>
@@ -240,8 +308,11 @@ export const VerClientesScreen = ({ route, navigation }: any) => {
 
                 if (
                     item.nombre.toLowerCase().includes(text.toLowerCase()) ||
-                    //item.status.toLowerCase().includes(text.toLowerCase()) ||
-                    item.numero.toLowerCase().includes(text.toLowerCase())
+                    item.status.toLowerCase().includes(text.toLowerCase()) ||
+                    item.numero.toLowerCase().includes(text.toLowerCase()) ||
+                    item.destino.toLowerCase().includes(text.toLowerCase()) || 
+                    item.clasificacion.toLowerCase().includes(text.toLowerCase()) || 
+                    item.descPaquete.toLowerCase().includes(text.toLowerCase()) 
                 ) {
                     return item;
                 }
@@ -309,7 +380,7 @@ export const VerClientesScreen = ({ route, navigation }: any) => {
                     loading ?
                     <>
                     {
-                        clientes.length > 0 ?
+                        (clientes.length > 0 || modoBusqueda) ?
                         <View style={{ flex: 1, marginHorizontal: 16 }}>
 
                             <Appbar.Header
@@ -368,6 +439,8 @@ export const VerClientesScreen = ({ route, navigation }: any) => {
                                             //clasif={clasif}
                                             updateCliente={updateCliente}
                                             navigation={navigation}
+                                            setLoading={setLoading}
+                                            getClientes={getClientes}
                                         />
                                     </View>
                                 }

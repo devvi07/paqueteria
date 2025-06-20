@@ -274,7 +274,7 @@ export const AddPaquete = ({ route, navigation }: any) => {
                                 <View style={{ marginHorizontal: 40 }}>
                                     <Card style={{ margin: 16 }} onPress={ takePhoto }>
 
-                                        <View style={{ height: 100, justifyContent: 'center', alignItems: 'center', backgroundColor: '#eee' }}>
+                                        <View style={{ height: 100, justifyContent: 'center', alignItems: 'center', backgroundColor: photos.length>0 ? '#20da86' :'#eee' }}>
                                             <IconButton icon="camera" size={80} style={{ backgroundColor: '#fFFF' }} />
                                         </View>
                                         <Card.Title
@@ -288,10 +288,17 @@ export const AddPaquete = ({ route, navigation }: any) => {
                                         />
 
                                     </Card>
+                                    {
+                                        photos.length>0 &&
+                                        <View>
+                                            <Text style={{ textAlign: 'center', fontSize: 15, color:'#004389', fontWeight: '600' }}>{`Fotos adjuntas: ${photos.length}`} </Text>
+                                        </View>
+                                    }
                                 </View>
 
                                 <View style={{ position: 'absolute', bottom: 0, width: '100%', padding: 16 }}>
                                     <Button
+                                        icon="gift-open"
                                         mode="contained"
                                         onPress={addPaquete}
                                         buttonColor='#004389'
@@ -303,6 +310,7 @@ export const AddPaquete = ({ route, navigation }: any) => {
 
                                     <View style={{ marginTop: 10 }}>
                                         <Button
+                                            icon="gift-off"
                                             mode="contained"
                                             onPress={() => { navigation.goBack(); }}
                                             buttonColor='#C62828'

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { Header } from '../../components/header/Header';
-import { Button, TextInput } from 'react-native-paper';
+import { ActivityIndicator, Button, TextInput } from 'react-native-paper';
 import { ModalAceptarConfirmar } from '../../components/modals/ModalAceptarConfirmar';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -9,6 +9,8 @@ import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context'
 export const ClientesRegister = ({ route, navigation }: any) => {
 
     const insets = useSafeAreaInsets();
+
+    const [ loading, setLoading ] = useState(true);
 
     const [numero, setNumero] = useState('');
     const [nombre, setNombre] = useState('');
@@ -26,6 +28,7 @@ export const ClientesRegister = ({ route, navigation }: any) => {
     const toggleModal = () => setVisibleModal(false);
 
     const createCliente = async (cliente: any) => {
+        setLoading(false);
         console.log("🚀 ~ createCliente ~ cliente:", cliente)
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
@@ -44,6 +47,7 @@ export const ClientesRegister = ({ route, navigation }: any) => {
             if (result.codigo == 201) {
                 setAcept(1);
                 setMessage('¡Cliente registrado exitosamente!');
+                setLoading(true);
                 showAlert();
             }
         }).catch((error) => {
@@ -120,155 +124,163 @@ export const ClientesRegister = ({ route, navigation }: any) => {
             <View style={[ styles.main ]}>
             <Header />
 
-            <KeyboardAvoidingView
-                style={{ flex: 1 }}
-                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-                keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // ajusta según tu header
-            >
-
-                <ScrollView
-                    contentContainerStyle={{ flexGrow: 1 }}
-                    keyboardShouldPersistTaps="handled"
+            {
+                loading ? 
+                <KeyboardAvoidingView
+                    style={{ flex: 1 }}
+                    behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                    keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // ajusta según tu header
                 >
 
-                    <View style={[ styles.container, { bottom: insets.bottom } ]}>
-                        <View style={styles.containerTitle}>
-                            <Text style={styles.title}>Registro de clientes</Text>
-                        </View>
+                    <ScrollView
+                        contentContainerStyle={{ flexGrow: 1 }}
+                        keyboardShouldPersistTaps="handled"
+                    >
 
-                        <View style={{ marginTop: 10, marginHorizontal: 16, flexDirection: 'row', gap: 40, justifyContent: 'center' }}>
-                            <View style={{ width: '45%' }}>
+                        <View style={[ styles.container ]}>
+                            <View style={styles.containerTitle}>
+                                <Text style={styles.title}>Registro de clientes</Text>
+                            </View>
+
+                            <View style={{ marginTop: 10, marginHorizontal: 16, flexDirection: 'row', gap: 40, justifyContent: 'center' }}>
+                                <View style={{ width: '45%' }}>
+                                    <TextInput
+                                        label="Número"
+                                        value={numero}
+                                        onChangeText={text => setNumero(text)}
+                                        theme={{ colors: { primary: '#004389' } }}
+                                        style={styles.input}
+                                        textColor='#000'
+                                        keyboardType='numeric'
+                                    />
+                                </View>
+                                <View style={{ width: '45%' }}>
+                                    <TextInput
+                                        label="Zona"
+                                        value={zona}
+                                        onChangeText={text => setZona(text)}
+                                        theme={{ colors: { primary: '#004389' } }}
+                                        style={styles.input}
+                                        textColor='#000'
+                                        keyboardType='numeric'
+                                    />
+                                </View>
+                            </View>
+
+                            <View style={styles.containerTitle}>
+                                <Text style={styles.title}>Persona que envia</Text>
+                            </View>
+
+                            <View style={{ marginTop: 10, marginHorizontal: 16 }}>
                                 <TextInput
-                                    label="Número"
-                                    value={numero}
-                                    onChangeText={text => setNumero(text)}
+                                    label="Nombre"
+                                    value={nombre}
+                                    onChangeText={text => setNombre(text)}
                                     theme={{ colors: { primary: '#004389' } }}
                                     style={styles.input}
                                     textColor='#000'
-                                    keyboardType='numeric'
                                 />
                             </View>
-                            <View style={{ width: '45%' }}>
+
+                            <View style={{ marginTop: 10, marginHorizontal: 16 }}>
                                 <TextInput
-                                    label="Zona"
-                                    value={zona}
-                                    onChangeText={text => setZona(text)}
+                                    label="Dirección"
+                                    value={direccion}
+                                    onChangeText={text => setDireccion(text)}
                                     theme={{ colors: { primary: '#004389' } }}
                                     style={styles.input}
                                     textColor='#000'
-                                    keyboardType='numeric'
                                 />
                             </View>
-                        </View>
 
-                        <View style={styles.containerTitle}>
-                            <Text style={styles.title}>Persona que envia</Text>
-                        </View>
+                            <View style={{ marginTop: 10, marginHorizontal: 16 }}>
+                                <TextInput
+                                    label="Teléfono"
+                                    value={tel}
+                                    onChangeText={text => setTel(text)}
+                                    theme={{ colors: { primary: '#004389' } }}
+                                    style={styles.input}
+                                    textColor='#000'
+                                    keyboardType='phone-pad'
+                                />
+                            </View>
 
-                        <View style={{ marginTop: 10, marginHorizontal: 16 }}>
-                            <TextInput
-                                label="Nombre"
-                                value={nombre}
-                                onChangeText={text => setNombre(text)}
-                                theme={{ colors: { primary: '#004389' } }}
-                                style={styles.input}
-                                textColor='#000'
-                            />
-                        </View>
+                            {/** PERSONA QUE RECIBE*/}
+                            <View style={styles.containerTitle}>
+                                <Text style={styles.title}>Persona que recibe</Text>
+                            </View>
 
-                        <View style={{ marginTop: 10, marginHorizontal: 16 }}>
-                            <TextInput
-                                label="Dirección"
-                                value={direccion}
-                                onChangeText={text => setDireccion(text)}
-                                theme={{ colors: { primary: '#004389' } }}
-                                style={styles.input}
-                                textColor='#000'
-                            />
-                        </View>
+                            <View style={{ marginTop: 10, marginHorizontal: 16 }}>
+                                <TextInput
+                                    label="Nombre"
+                                    value={nombreRecibe}
+                                    onChangeText={text => setNombreRecibe(text)}
+                                    theme={{ colors: { primary: '#004389' } }}
+                                    style={styles.input}
+                                    textColor='#000'
+                                />
+                            </View>
 
-                        <View style={{ marginTop: 10, marginHorizontal: 16 }}>
-                            <TextInput
-                                label="Teléfono"
-                                value={tel}
-                                onChangeText={text => setTel(text)}
-                                theme={{ colors: { primary: '#004389' } }}
-                                style={styles.input}
-                                textColor='#000'
-                                keyboardType='phone-pad'
-                            />
-                        </View>
+                            <View style={{ marginTop: 10, marginHorizontal: 16 }}>
+                                <TextInput
+                                    label="Dirección"
+                                    value={direccionRecibe}
+                                    onChangeText={text => setDireccionRecibe(text)}
+                                    theme={{ colors: { primary: '#004389' } }}
+                                    style={styles.input}
+                                    textColor='#000'
+                                />
+                            </View>
 
-                        {/** PERSONA QUE RECIBE*/}
-                        <View style={styles.containerTitle}>
-                            <Text style={styles.title}>Persona que recibe</Text>
-                        </View>
+                            <View style={{ marginTop: 10, marginHorizontal: 16 }}>
+                                <TextInput
+                                    label="Teléfono"
+                                    value={telRecibe}
+                                    onChangeText={text => setTelRecibe(text)}
+                                    theme={{ colors: { primary: '#004389' } }}
+                                    style={styles.input}
+                                    textColor='#000'
+                                    keyboardType='phone-pad'
+                                />
+                            </View>
 
-                        <View style={{ marginTop: 10, marginHorizontal: 16 }}>
-                            <TextInput
-                                label="Nombre"
-                                value={nombreRecibe}
-                                onChangeText={text => setNombreRecibe(text)}
-                                theme={{ colors: { primary: '#004389' } }}
-                                style={styles.input}
-                                textColor='#000'
-                            />
-                        </View>
-
-                        <View style={{ marginTop: 10, marginHorizontal: 16 }}>
-                            <TextInput
-                                label="Dirección"
-                                value={direccionRecibe}
-                                onChangeText={text => setDireccionRecibe(text)}
-                                theme={{ colors: { primary: '#004389' } }}
-                                style={styles.input}
-                                textColor='#000'
-                            />
-                        </View>
-
-                        <View style={{ marginTop: 10, marginHorizontal: 16 }}>
-                            <TextInput
-                                label="Teléfono"
-                                value={telRecibe}
-                                onChangeText={text => setTelRecibe(text)}
-                                theme={{ colors: { primary: '#004389' } }}
-                                style={styles.input}
-                                textColor='#000'
-                                keyboardType='phone-pad'
-                            />
-                        </View>
-
-                        <View style={{ marginHorizontal: 20, marginTop: 25, marginBottom: 25 }}>
-                            <Button
-                                mode="contained"
-                                onPress={addCliente}
-                                buttonColor='#004389'
-                                labelStyle={{ color: '#FFF' }}
-                                style={{ borderRadius: 7 }}
-                            >
-                                Registrar
-                            </Button>
-
-                            <View style={{ marginTop: 10 }}>
+                            <View style={{ marginHorizontal: 20, marginTop: 25, marginBottom: 25 }}>
                                 <Button
+                                    icon="account-check"
                                     mode="contained"
-                                    onPress={() => { navigation.goBack(); }}
-                                    buttonColor='#C62828'
+                                    onPress={addCliente}
+                                    buttonColor='#004389'
                                     labelStyle={{ color: '#FFF' }}
                                     style={{ borderRadius: 7 }}
                                 >
-                                    Cancelar
+                                    Registrar
                                 </Button>
+
+                                <View style={{ marginTop: 10 }}>
+                                    <Button
+                                        icon="account-cancel"
+                                        mode="contained"
+                                        onPress={() => { navigation.goBack(); }}
+                                        buttonColor='#C62828'
+                                        labelStyle={{ color: '#FFF' }}
+                                        style={{ borderRadius: 7 }}
+                                    >
+                                        Cancelar
+                                    </Button>
+                                </View>
+
                             </View>
 
                         </View>
 
-                    </View>
+                    </ScrollView>
 
-                </ScrollView>
-
-            </KeyboardAvoidingView>
-
+                </KeyboardAvoidingView>
+                :<View style={{ justifyContent: 'center', alignContent: 'center', marginTop: 250 }}>
+                    <ActivityIndicator animating={true} color={'#004389'} size={50} />
+                </View>
+            }
+            
             <ModalAceptarConfirmar
                 title={message}
                 visible={visibleModal}
@@ -291,7 +303,7 @@ const styles = StyleSheet.create({
         flex: 1,
         backgroundColor: '#F6F6F6',
         marginHorizontal: 16,
-        marginTop: 50,
+        marginTop: 10,
         //marginBottom: 10,
         borderRadius: 10
     },
